@@ -42,14 +42,16 @@ class Round:
         self.comets = [Comet(190, 120, 125, 17), Comet(525, 190, -145, 21),
                        Comet(350, 260, 150, 16), Comet(650, 345, -170, 19)]
         self.fuel = []
-        while len(self.fuel) < 7:
+        for _ in range(7):
             self.spawn_fuel()
 
     def spawn_fuel(self):
         spots = [(x, y) for x in range(110, WIDTH - 88, 40)
                  for y in range(94, HEIGHT - 30, 35)
                  if all(not near(x, y, fx, fy, 38) for fx, fy in self.fuel)
-                 and all(not near(x, y, ship.x, ship.y, 40) for ship in self.ships)]
+                 and all(not near(x, y, ship.x, ship.y, 40) for ship in self.ships)
+                 and all(not near(x, y, comet.x, comet.y, comet.radius + 15)
+                         for comet in self.comets)]
         if spots:
             self.fuel.append(self.rng.choice(spots))
 

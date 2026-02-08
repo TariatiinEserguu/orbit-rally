@@ -120,6 +120,13 @@ class OrbitRally:
         if self.running and self.round.remaining > 0:
             self.paused = True
 
+    def start_round(self):
+        self.round = Round(seconds=self.seconds)
+        self.running = True
+        self.paused = False
+        self.last_tick = time.monotonic()
+        self.keys.clear()
+
     def press(self, event):
         key = event.keysym.lower()
         between_rounds = not self.running or self.round.remaining <= 0
@@ -128,11 +135,9 @@ class OrbitRally:
             if not self.running:
                 self.round.remaining = float(self.seconds)
         elif key == 'return' and between_rounds:
-            self.round = Round(seconds=self.seconds)
-            self.running = True
-            self.paused = False
-            self.last_tick = time.monotonic()
-            self.keys.clear()
+            self.start_round()
+        elif key == 'r' and self.paused:
+            self.start_round()
         elif key == 'p':
             self.pause_round()
         elif key == 'return' and self.paused:
@@ -186,7 +191,7 @@ class OrbitRally:
         if not self.running:
             self.overlay('Orbit Rally', 'Collect gold fuel. Dodge the comets.', f'1–3 Select {self.seconds}s  ·  Enter to start')
         elif self.paused:
-            self.overlay('Paused', 'The round timer is stopped.', 'Press Enter to resume')
+            self.overlay('Paused', 'The round timer is stopped.', 'Enter to resume  ·  R to restart')
         elif self.round.remaining <= 0:
             first, second = (ship.score for ship in self.round.ships)
             winner = 'Tie game' if first == second else f'Player {1 if first > second else 2} wins'

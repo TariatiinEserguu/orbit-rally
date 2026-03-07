@@ -36,12 +36,15 @@ def near(x, y, target_x, target_y, distance):
 
 
 class Round:
-    def __init__(self, seed=None, *, seconds=45):
+    def __init__(self, seed=None, *, seconds=45, practice=False):
         self.rng = random.Random(seed)
+        self.practice = practice
         self.remaining = float(seconds)
         self.ships = [Ship(70, HEIGHT / 2), Ship(WIDTH - 70, HEIGHT / 2)]
         self.comets = [Comet(190, 120, 125, 17), Comet(525, 190, -145, 21),
                        Comet(350, 260, 150, 16), Comet(650, 345, -170, 19)]
+        if practice:
+            self.comets.clear()
         self.fuel = []
         for _ in range(7):
             self.spawn_fuel()
@@ -101,8 +104,9 @@ class OrbitRally:
         root.resizable(False, False)
         self.canvas = tk.Canvas(root, width=WIDTH, height=HEIGHT, bg='#101426', highlightthickness=0)
         self.canvas.pack()
+        self.practice = False
         self.seconds = ROUND_LENGTHS['2']
-        self.round = Round(seconds=self.seconds)
+        self.round = Round(seconds=self.seconds, practice=self.practice)
         self.keys = set()
         self.running = False
         self.paused = False
@@ -121,7 +125,7 @@ class OrbitRally:
             self.paused = True
 
     def start_round(self):
-        self.round = Round(seconds=self.seconds)
+        self.round = Round(seconds=self.seconds, practice=self.practice)
         self.running = True
         self.paused = False
         self.last_tick = time.monotonic()
@@ -130,7 +134,11 @@ class OrbitRally:
     def press(self, event):
         key = event.keysym.lower()
         between_rounds = not self.running or self.round.remaining <= 0
-        if key in ROUND_LENGTHS and between_rounds:
+        if key == 'm' and between_rounds:
+            self.practice = not self.practice
+            if not self.running:
+                self.round = Round(seconds=self.seconds, practice=self.practice)
+        elif key in ROUND_LENGTHS and between_rounds:
             self.seconds = ROUND_LENGTHS[key]
             if not self.running:
                 self.round.remaining = float(self.seconds)
@@ -152,7 +160,7 @@ class OrbitRally:
             self.round.step(min(now - self.last_tick, 0.05), self.keys)
             if self.round.remaining <= 0:
                 first, second = (ship.score for ship in self.round.ships)
-                if first != second:
+                if first != second and not self.round.practice:
                     self.wins[int(second > first)] += 1
         self.last_tick = now
         self.draw()
@@ -188,14 +196,16 @@ class OrbitRally:
             c.create_polygon(*hull, fill=COLORS[index])
             c.create_oval(x - 3, y - 3, x + 3, y + 3, fill='#202642', outline='')
 
+        mode = 'Practice' if self.practice else 'Comets'
+        setup = f'M {mode}  ·  1–3 Select {self.seconds}s  ·  Enter to play'
         if not self.running:
-            self.overlay('Orbit Rally', 'Collect gold fuel. Dodge the comets.', f'1–3 Select {self.seconds}s  ·  Enter to start')
+            self.overlay('Orbit Rally', 'Collect gold fuel. Dodge the comets.', setup)
         elif self.paused:
             self.overlay('Paused', 'The round timer is stopped.', 'Enter to resume  ·  R to restart')
         elif self.round.remaining <= 0:
             first, second = (ship.score for ship in self.round.ships)
             winner = 'Tie game' if first == second else f'Player {1 if first > second else 2} wins'
-            self.overlay(winner, f'Round  {first} – {second}     Session wins  {self.wins[0]} – {self.wins[1]}', f'1–3 Select {self.seconds}s  ·  Enter to replay')
+            self.overlay(winner, f'Round  {first} – {second}     Session wins  {self.wins[0]} – {self.wins[1]}', setup)
 
     def overlay(self, title, subtitle, hint):
         c = self.canvas

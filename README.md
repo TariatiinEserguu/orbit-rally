@@ -1,6 +1,6 @@
 # Orbit Rally
 
-A 45-second 2D arcade game for two players on the same keyboard. Fly through an asteroid field, collect gold fuel, and finish with the higher score.
+A 2D arcade game for two players on the same keyboard. Fly through an asteroid field, collect gold fuel, and finish with the higher score.
 
 ## Play
 
@@ -11,7 +11,7 @@ python3 orbit_rally.py
 Requires Python 3.10+ with Tkinter and a graphical desktop. On Debian and Ubuntu, install `python3-tk` if Tkinter is missing.
 
 - **Player 1** moves with WASD. **Player 2** uses the arrow keys.
-- Press **Enter** to start or replay.
+- Press **1**, **2**, or **3** to select a 30-, 45-, or 60-second round, then **Enter** to start or replay.
 - Press **P** to pause the round and **Enter** to resume.
 - The round also pauses when you switch away from the game window.
 - Each piece of fuel earns one point and respawns elsewhere.

@@ -39,7 +39,8 @@ class Round:
     def __init__(self, seed=None, *, seconds=45, practice=False):
         self.rng = random.Random(seed)
         self.practice = practice
-        self.remaining = float(seconds)
+        self.duration = float(seconds)
+        self.remaining = self.duration
         self.ships = [Ship(70, HEIGHT / 2), Ship(WIDTH - 70, HEIGHT / 2)]
         self.comets = [Comet(190, 120, 125, 17), Comet(525, 190, -145, 21),
                        Comet(350, 260, 150, 16), Comet(650, 345, -170, 19)]
@@ -141,7 +142,7 @@ class OrbitRally:
         elif key in ROUND_LENGTHS and between_rounds:
             self.seconds = ROUND_LENGTHS[key]
             if not self.running:
-                self.round.remaining = float(self.seconds)
+                self.round = Round(seconds=self.seconds, practice=self.practice)
         elif key == 'return' and between_rounds:
             self.start_round()
         elif key == 'r' and self.paused:
@@ -174,7 +175,12 @@ class OrbitRally:
         c.create_rectangle(0, 0, WIDTH, 58, fill='#1b2039', outline='')
         c.create_text(23, 29, anchor='w', text=f'P1  {self.round.ships[0].score:02}', fill=COLORS[0], font=('TkDefaultFont', 16, 'bold'))
         c.create_text(WIDTH - 23, 29, anchor='e', text=f'{self.round.ships[1].score:02}  P2', fill=COLORS[1], font=('TkDefaultFont', 16, 'bold'))
-        c.create_text(WIDTH / 2, 29, text=f'{math.ceil(self.round.remaining):02}s', fill='#eff0ff', font=('TkDefaultFont', 17, 'bold'))
+        clock_color = '#ff987c' if self.round.remaining <= 10 else '#eff0ff'
+        c.create_text(WIDTH / 2, 25, text=f'{math.ceil(self.round.remaining):02}s', fill=clock_color, font=('TkDefaultFont', 17, 'bold'))
+        bar_left = WIDTH / 2 - 48
+        c.create_rectangle(bar_left, 44, bar_left + 96, 49, fill='#393e59', outline='')
+        c.create_rectangle(bar_left, 44, bar_left + 96 * self.round.remaining / self.round.duration,
+                           49, fill=clock_color, outline='')
 
         for comet in self.round.comets:
             x, y, r = comet.x, comet.y, comet.radius

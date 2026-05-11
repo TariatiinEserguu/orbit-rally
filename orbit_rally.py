@@ -60,6 +60,16 @@ class Round:
         if spots:
             self.fuel.append(self.rng.choice(spots))
 
+    def advance(self, elapsed, keys):
+        # Limit physics catch-up after a stall while still charging time to the round.
+        elapsed = min(elapsed, self.remaining)
+        physics_time = min(elapsed, 0.16)
+        while physics_time > 0:
+            step = min(physics_time, 0.02)
+            self.step(step, keys)
+            physics_time -= step
+        self.remaining = max(0.0, self.remaining - max(0.0, elapsed - 0.16))
+
     def step(self, dt, keys):
         dt = min(dt, self.remaining)
         if dt <= 0:
@@ -158,7 +168,7 @@ class OrbitRally:
     def tick(self):
         now = time.monotonic()
         if self.running and not self.paused and self.round.remaining > 0:
-            self.round.step(min(now - self.last_tick, 0.05), self.keys)
+            self.round.advance(now - self.last_tick, self.keys)
             if self.round.remaining <= 0:
                 first, second = (ship.score for ship in self.round.ships)
                 if first != second and not self.round.practice:

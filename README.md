@@ -19,3 +19,5 @@ Requires Python 3.10+ with Tkinter and a graphical desktop. On Debian and Ubuntu
 - Session wins carry over between rounds until you close the game. Ties count for neither player.
 
 Press **M** between rounds to toggle comet-free practice. Practice rounds stay out of the session win count.
+
+Run `python3 orbit_rally.py --seed 42` to replay the same starting fuel layout and compare runs.

@@ -1,4 +1,5 @@
 """A two-player arcade game about collecting fuel before time runs out."""
+import argparse
 import math
 import random
 import time
@@ -109,15 +110,16 @@ class Round:
 
 
 class OrbitRally:
-    def __init__(self, root):
+    def __init__(self, root, seed=None):
         self.root = root
+        self.seed = seed
         root.title('Orbit Rally')
         root.resizable(False, False)
         self.canvas = tk.Canvas(root, width=WIDTH, height=HEIGHT, bg='#101426', highlightthickness=0)
         self.canvas.pack()
         self.practice = False
         self.seconds = ROUND_LENGTHS['2']
-        self.round = Round(seconds=self.seconds, practice=self.practice)
+        self.round = Round(seed=self.seed, seconds=self.seconds, practice=self.practice)
         self.keys = set()
         self.running = False
         self.paused = False
@@ -136,7 +138,7 @@ class OrbitRally:
             self.paused = True
 
     def start_round(self):
-        self.round = Round(seconds=self.seconds, practice=self.practice)
+        self.round = Round(seed=self.seed, seconds=self.seconds, practice=self.practice)
         self.running = True
         self.paused = False
         self.last_tick = time.monotonic()
@@ -148,11 +150,11 @@ class OrbitRally:
         if key == 'm' and between_rounds:
             self.practice = not self.practice
             if not self.running:
-                self.round = Round(seconds=self.seconds, practice=self.practice)
+                self.round = Round(seed=self.seed, seconds=self.seconds, practice=self.practice)
         elif key in ROUND_LENGTHS and between_rounds:
             self.seconds = ROUND_LENGTHS[key]
             if not self.running:
-                self.round = Round(seconds=self.seconds, practice=self.practice)
+                self.round = Round(seed=self.seed, seconds=self.seconds, practice=self.practice)
         elif key == 'return' and between_rounds:
             self.start_round()
         elif key == 'r' and self.paused:
@@ -230,7 +232,14 @@ class OrbitRally:
             c.create_text(WIDTH / 2, y, text=text, fill=color, font=('TkDefaultFont', size, 'bold'))
 
 
-if __name__ == '__main__':
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--seed', type=int, help='Reuse a fuel layout across rounds')
+    args = parser.parse_args(argv)
     root = tk.Tk()
-    game = OrbitRally(root)
+    OrbitRally(root, seed=args.seed)
     root.mainloop()
+
+
+if __name__ == '__main__':
+    main()

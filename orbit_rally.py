@@ -20,6 +20,7 @@ class Ship:
     y: float
     score: int = 0
     shield: float = 0.0
+    heading: float = -math.pi / 2
 
 
 @dataclass
@@ -67,6 +68,7 @@ class Round:
             dx = (right in keys) - (left in keys)
             dy = (down in keys) - (up in keys)
             if dx or dy:
+                ship.heading = math.atan2(dy, dx)
                 distance = SPEED * dt / math.hypot(dx, dy)
                 ship.x = max(RADIUS, min(WIDTH - RADIUS, ship.x + dx * distance))
                 ship.y = max(71, min(HEIGHT - RADIUS, ship.y + dy * distance))
@@ -169,7 +171,11 @@ class OrbitRally:
             x, y = ship.x, ship.y
             if ship.shield:
                 c.create_oval(x - 18, y - 18, x + 18, y + 18, outline=COLORS[index], dash=(4, 3))
-            c.create_polygon(x, y - 14, x + 13, y + 11, x, y + 6, x - 13, y + 11, fill=COLORS[index])
+            forward_x, forward_y = math.cos(ship.heading), math.sin(ship.heading)
+            hull = [(x + forward_x * ahead - forward_y * side,
+                     y + forward_y * ahead + forward_x * side)
+                    for ahead, side in ((15, 0), (-11, 13), (-6, 0), (-11, -13))]
+            c.create_polygon(*hull, fill=COLORS[index])
             c.create_oval(x - 3, y - 3, x + 3, y + 3, fill='#202642', outline='')
 
         if not self.running:

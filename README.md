@@ -21,3 +21,5 @@ Requires Python 3.10+ with Tkinter and a graphical desktop. On Debian and Ubuntu
 Press **M** between rounds to toggle comet-free practice. Practice rounds stay out of the session win count.
 
 Run `python3 orbit_rally.py --seed 42` to replay the same starting fuel layout and compare runs.
+
+The end-of-round summary shows each player's fuel pickups and comet hits alongside the final score and session wins.

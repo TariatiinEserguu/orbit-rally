@@ -21,6 +21,8 @@ class Ship:
     y: float
     score: int = 0
     shield: float = 0.0
+    hits: int = 0
+    pickups: int = 0
     heading: float = -math.pi / 2
 
 
@@ -90,6 +92,7 @@ class Round:
             ship.shield = max(0.0, ship.shield - dt)
             if not ship.shield and any(near(ship.x, ship.y, comet.x, comet.y, RADIUS + comet.radius)
                                        for comet in self.comets):
+                ship.hits += 1
                 ship.score = max(0, ship.score - 1)
                 ship.shield = 0.9
 
@@ -101,6 +104,7 @@ class Round:
             (distance, winner), (other, _) = distances
             if distance <= (RADIUS + 9) ** 2 and distance < other:
                 self.ships[winner].score += 1
+                self.ships[winner].pickups += 1
             else:
                 remaining_fuel.append((x, y))
         replacements = len(self.fuel) - len(remaining_fuel)
@@ -223,7 +227,10 @@ class OrbitRally:
         elif self.round.remaining <= 0:
             first, second = (ship.score for ship in self.round.ships)
             winner = 'Tie game' if first == second else f'Player {1 if first > second else 2} wins'
-            self.overlay(winner, f'Round  {first} – {second}     Session wins  {self.wins[0]} – {self.wins[1]}', setup)
+            left, right = self.round.ships
+            summary = (f'Score {first}–{second}    Fuel {left.pickups}–{right.pickups}    '
+                       f'Hits {left.hits}–{right.hits}    Wins {self.wins[0]}–{self.wins[1]}')
+            self.overlay(winner, summary, setup)
 
     def overlay(self, title, subtitle, hint):
         c = self.canvas

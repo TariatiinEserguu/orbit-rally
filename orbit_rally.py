@@ -215,8 +215,10 @@ class OrbitRally:
             hull = [(x + forward_x * ahead - forward_y * side,
                      y + forward_y * ahead + forward_x * side)
                     for ahead, side in ((15, 0), (-11, 13), (-6, 0), (-11, -13))]
-            c.create_polygon(*hull, fill=COLORS[index])
+            c.create_polygon(*hull, fill=COLORS[index], outline='#1b2039', width=2)
             c.create_oval(x - 3, y - 3, x + 3, y + 3, fill='#202642', outline='')
+            label_y = y + 23 if y < HEIGHT - 32 else y - 23
+            c.create_text(x, label_y, text=str(index + 1), fill='#f1f2ff', font=('TkDefaultFont', 9, 'bold'))
 
         mode = 'Practice' if self.practice else 'Comets'
         setup = f'M {mode}  ·  1–3 Select {self.seconds}s  ·  Enter to play'

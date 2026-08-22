@@ -23,3 +23,5 @@ Press **M** between rounds to toggle comet-free practice. Practice rounds stay o
 Run `python3 orbit_rally.py --seed 42` to replay the same starting fuel layout and compare runs.
 
 The end-of-round summary shows each player's fuel pickups and comet hits alongside the final score and session wins.
+
+Run the game rules tests with `python3 -m unittest discover`.

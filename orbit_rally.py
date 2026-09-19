@@ -106,6 +106,7 @@ class OrbitRally:
         self.keys = set()
         self.running = False
         self.paused = False
+        self.wins = [0, 0]
         self.last_tick = time.monotonic()
         sky = random.Random(32)
         self.stars = [(sky.randrange(WIDTH), sky.randrange(65, HEIGHT), sky.choice((1, 1, 2))) for _ in range(100)]
@@ -144,6 +145,10 @@ class OrbitRally:
         now = time.monotonic()
         if self.running and not self.paused and self.round.remaining > 0:
             self.round.step(min(now - self.last_tick, 0.05), self.keys)
+            if self.round.remaining <= 0:
+                first, second = (ship.score for ship in self.round.ships)
+                if first != second:
+                    self.wins[int(second > first)] += 1
         self.last_tick = now
         self.draw()
         self.root.after(16, self.tick)
@@ -185,7 +190,7 @@ class OrbitRally:
         elif self.round.remaining <= 0:
             first, second = (ship.score for ship in self.round.ships)
             winner = 'Tie game' if first == second else f'Player {1 if first > second else 2} wins'
-            self.overlay(winner, f'Final score  {first} – {second}', f'1–3 Select {self.seconds}s  ·  Enter to replay')
+            self.overlay(winner, f'Round  {first} – {second}     Session wins  {self.wins[0]} – {self.wins[1]}', f'1–3 Select {self.seconds}s  ·  Enter to replay')
 
     def overlay(self, title, subtitle, hint):
         c = self.canvas

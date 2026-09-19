@@ -16,3 +16,4 @@ Requires Python 3.10+ with Tkinter and a graphical desktop. On Debian and Ubuntu
 - The round also pauses when you switch away from the game window.
 - Each piece of fuel earns one point and respawns elsewhere.
 - A comet hit costs one point and briefly shields your ship.
+- Session wins carry over between rounds until you close the game. Ties count for neither player.

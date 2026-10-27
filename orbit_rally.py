@@ -106,8 +106,13 @@ class OrbitRally:
         self.stars = [(sky.randrange(WIDTH), sky.randrange(65, HEIGHT), sky.choice((1, 1, 2))) for _ in range(100)]
         root.bind('<KeyPress>', self.press)
         root.bind('<KeyRelease>', lambda event: self.keys.discard(event.keysym.lower()))
-        root.bind('<FocusOut>', lambda event: self.keys.clear())
+        root.bind('<FocusOut>', self.pause_round)
         self.tick()
+
+    def pause_round(self, event=None):
+        self.keys.clear()
+        if self.running and self.round.remaining > 0:
+            self.paused = True
 
     def press(self, event):
         key = event.keysym.lower()
@@ -117,9 +122,8 @@ class OrbitRally:
             self.paused = False
             self.last_tick = time.monotonic()
             self.keys.clear()
-        elif key == 'p' and self.running and self.round.remaining > 0:
-            self.paused = True
-            self.keys.clear()
+        elif key == 'p':
+            self.pause_round()
         elif key == 'return' and self.paused:
             self.paused = False
             self.last_tick = time.monotonic()

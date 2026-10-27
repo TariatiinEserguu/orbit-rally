@@ -13,5 +13,6 @@ Requires Python 3.10+ with Tkinter and a graphical desktop. On Debian and Ubuntu
 - **Player 1** moves with WASD. **Player 2** uses the arrow keys.
 - Press **Enter** to start or replay.
 - Press **P** to pause the round and **Enter** to resume.
+- The round also pauses when you switch away from the game window.
 - Each piece of fuel earns one point and respawns elsewhere.
 - A comet hit costs one point and briefly shields your ship.

@@ -100,6 +100,7 @@ class OrbitRally:
         self.round = Round()
         self.keys = set()
         self.running = False
+        self.paused = False
         self.last_tick = time.monotonic()
         sky = random.Random(32)
         self.stars = [(sky.randrange(WIDTH), sky.randrange(65, HEIGHT), sky.choice((1, 1, 2))) for _ in range(100)]
@@ -113,14 +114,21 @@ class OrbitRally:
         if key == 'return' and (not self.running or self.round.remaining <= 0):
             self.round = Round()
             self.running = True
+            self.paused = False
             self.last_tick = time.monotonic()
             self.keys.clear()
-        elif key in MOVEMENT_KEYS:
+        elif key == 'p' and self.running and self.round.remaining > 0:
+            self.paused = True
+            self.keys.clear()
+        elif key == 'return' and self.paused:
+            self.paused = False
+            self.last_tick = time.monotonic()
+        elif key in MOVEMENT_KEYS and not self.paused:
             self.keys.add(key)
 
     def tick(self):
         now = time.monotonic()
-        if self.running and self.round.remaining > 0:
+        if self.running and not self.paused and self.round.remaining > 0:
             self.round.step(min(now - self.last_tick, 0.05), self.keys)
         self.last_tick = now
         self.draw()
@@ -153,7 +161,9 @@ class OrbitRally:
             c.create_oval(x - 3, y - 3, x + 3, y + 3, fill='#202642', outline='')
 
         if not self.running:
-            self.overlay('Orbit Rally', 'Collect gold fuel. Dodge the comets.', 'P1 WASD  ·  P2 Arrow keys  ·  Enter to start')
+            self.overlay('Orbit Rally', 'Collect gold fuel. Dodge the comets.', 'WASD  ·  Arrows  ·  P to pause  ·  Enter to start')
+        elif self.paused:
+            self.overlay('Paused', 'The round timer is stopped.', 'Press Enter to resume')
         elif self.round.remaining <= 0:
             first, second = (ship.score for ship in self.round.ships)
             winner = 'Tie game' if first == second else f'Player {1 if first > second else 2} wins'

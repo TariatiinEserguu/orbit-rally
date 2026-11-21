@@ -1,16 +1,16 @@
-# Watchlist for Two
+# Orbit Rally
 
-Build a joint movie or show shortlist. Each person votes separately, and the app shows titles you both want to watch.
+A 45-second 2D arcade game for two players on the same keyboard. Fly through an asteroid field, collect gold fuel, and finish with the higher score.
 
-Requires Python 3.10 or newer. No packages to install.
+## Play
 
 ```sh
-python3 watchlist.py add "Arrival"
-python3 watchlist.py vote "Arrival" 1 yes
-python3 watchlist.py vote "Arrival" 2 yes
-python3 watchlist.py matches
+python3 orbit_rally.py
 ```
 
-Use `list` to see every title and its current votes. Vote again to change your choice. Titles are case-insensitive. Votes are saved in `watchlist.sqlite3` in your current directory. Run both people's commands against the same local file, or specify another file with `--db path/to/watchlist.sqlite3` before the subcommand.
+Requires Python 3.10+ with Tkinter and a graphical desktop. On Debian and Ubuntu, install `python3-tk` if Tkinter is missing.
 
-Run the tests with `python3 -m unittest discover`.
+- **Player 1** moves with WASD. **Player 2** uses the arrow keys.
+- Press **Enter** to start or replay.
+- Each piece of fuel earns one point and respawns elsewhere.
+- A comet hit costs one point and briefly shields your ship.
